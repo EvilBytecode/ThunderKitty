@@ -1,5 +1,6 @@
 # ThunderKitty
 🔑 Open source stealer written in Go, all logs will be sent to Telegram bot.
+- BTW WHEN USING FYNE, IT TAKES SOME TIME TO BUILD IF YOURE DEVELOPER DONT BE CONFUSED, IT CAN TAKE UP TO 10MINUTES WHEN ITS INSTALLING BASED ON YOUR PC.
 ![ThunderKittyLogo](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/3c98bcf2-b958-48ae-8c5a-c8a0be13abd4)
 
 ### WIP.
