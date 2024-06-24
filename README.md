@@ -3,6 +3,7 @@
 ![ThunderKittyLogo](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/3c98bcf2-b958-48ae-8c5a-c8a0be13abd4)
 
 ### WIP.
+GUI : ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/fef45632-2d49-4588-8031-c542a958e0af)
 
 ## CURRENT FEATURES
 - Really Advanced AntiDebug and AntiVM (Detects https://tria.ge)
