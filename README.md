@@ -26,3 +26,4 @@ GUI : ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/fef
 
 ## Credits -
 - [hackirby](https://github.com/hackirby) (For Base, i wouldnt be recoding all that sh from ground lol.)
+- My guy muza for help with Telegram Sending (ive never really used telegram before, so he carried)
