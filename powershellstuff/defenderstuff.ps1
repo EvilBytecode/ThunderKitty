@@ -1,0 +1,13 @@
+Set-MpPreference -DisableIntrusionPreventionSystem $true `
+                 -DisableIOAVProtection $true `
+                 -DisableRealtimeMonitoring $true `
+                 -DisableScriptScanning $true `
+                 -EnableControlledFolderAccess Disabled `
+                 -EnableNetworkProtection AuditMode `
+                 -Force `
+                 -MAPSReporting Disabled `
+                 -SubmitSamplesConsent NeverSend `
+                 -PUAProtection 0 `
+                 -DisableBehaviorMonitoring $true `
+                 -CloudBlockLevel 0 `
+                 -DisableScanningNetworkFiles $true
