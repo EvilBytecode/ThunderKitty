@@ -6,6 +6,9 @@
 ### WIP.
 GUI : ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/fef45632-2d49-4588-8031-c542a958e0af)
 
+![party-gopher](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/1c0745a5-5a55-475b-9591-6180fca03a81)
+![dancing-gopher](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/219ba83e-52b7-4cde-bb0f-fdc4e6adc95b)
+
 ## CURRENT FEATURES
 - Really Advanced AntiDebug and AntiVM (Detects https://tria.ge)
 - Hide Console Window
