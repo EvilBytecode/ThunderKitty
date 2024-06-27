@@ -72,3 +72,6 @@
 
 - [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
 - [SecDbg](https://github.com/secdbg) - Contributing heavily to development.
+
+![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/09ce45b5-81d5-4940-a2d8-99706c5aaed1)
+
