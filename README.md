@@ -36,6 +36,7 @@
 - Swaps Mouse Buttons
 - Changes Wallpaper
 - Text-to-speech upon execution
+- System Info
 
 ## Installation & Setup
 ### Pre-requisites:
