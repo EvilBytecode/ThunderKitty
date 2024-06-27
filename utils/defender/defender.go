@@ -18,7 +18,7 @@ func Disable() {
 	si.Cb = uint32(unsafe.Sizeof(si))
 
 	syscall.CreateProcess(nil, sigma, nil, nil, false, 0, nil, nil, &si, &pi)
+	defer syscall.CloseHandle(pi.Process)
+	defer syscall.CloseHandle(pi.Thread)
 	syscall.WaitForSingleObject(pi.Process, syscall.INFINITE)
-	syscall.CloseHandle(pi.Process)
-	syscall.CloseHandle(pi.Thread)
 }
