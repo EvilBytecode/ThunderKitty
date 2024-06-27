@@ -63,11 +63,11 @@
 
 ![Detection Image 1](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/314a45d2-739f-4244-8daf-a257c61c133a)
 ![Detection Image 2](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/0d773da7-3511-41e3-ac80-86dcf7b88f8d)
+![Detection Image3](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/93f2149c-099d-4af5-8f8d-e735db9c054e)
 
 ---
 
 ## Credits
 
 - [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
-- Muza - Providing help with Telegram message sending. (Never really used Telegram before, so he carried)
 - [SecDbg](https://github.com/secdbg) - Contributing heavily to development.
