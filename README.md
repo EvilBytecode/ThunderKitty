@@ -63,6 +63,7 @@
 
 ![Detection Image 1](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/314a45d2-739f-4244-8daf-a257c61c133a)
 ![Detection Image 2](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/0d773da7-3511-41e3-ac80-86dcf7b88f8d)
+![Detection Image 3](https://i.imgur.com/WCZbDJq.png)
 
 ---
 
