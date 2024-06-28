@@ -71,7 +71,7 @@
 ## Credits
 
 - [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
-- [SecDbg](https://github.com/secdbg) - Contributing heavily to development.
-
+- [SecDbg](https://github.com/secdbg) - Contributing heavily to development (Follow him, Deserved asf and hes 🐐).
+- [KDot227](https://github.com/KDot227) - Hosts list.
 ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/09ce45b5-81d5-4940-a2d8-99706c5aaed1)
 
