@@ -95,4 +95,4 @@
 - Kill Discord Token Protector
 - Modify Assembly Info (Icon,Assm Info etc) (metadata)
 - Documentation inside GUI, what each thing does.
-- Encrypt Traffic
+- Encrypted Traffic (HTTPS)
