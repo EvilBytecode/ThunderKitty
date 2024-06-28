@@ -10,12 +10,9 @@ import (
 	"path/filepath"
 )
 
-const (
-	telegramAPIBase = "https://api.telegram.org/bot"
-)
-
 // SendToTelegram sends a message or a file to a Telegram chat.
 func SendToTelegram(botToken, chatID, message, filePath string) error {
+	fmt.Println("Sending to telegram", filePath)
 	apiBaseURL := "https://api.telegram.org/bot"
 	client := &http.Client{}
 	body := &bytes.Buffer{}
