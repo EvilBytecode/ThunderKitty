@@ -36,6 +36,7 @@
 - Swaps Mouse Buttons
 - Changes Wallpaper
 - Text-to-speech upon execution
+- System Info
 
 ## Installation & Setup
 ### Pre-requisites:
@@ -63,12 +64,34 @@
 
 ![Detection Image 1](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/314a45d2-739f-4244-8daf-a257c61c133a)
 ![Detection Image 2](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/0d773da7-3511-41e3-ac80-86dcf7b88f8d)
-![Detection Image 3](https://i.imgur.com/WCZbDJq.png)
+![Detection Image3](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/93f2149c-099d-4af5-8f8d-e735db9c054e)
+
+---
+
+## GUI & Logs:
+![photo_2024-06-27_10-24-51](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/493a1360-88eb-4cef-9ed6-11ea97c26354)
+![photo_2024-06-27_10-24-51 (2)](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/f85e40bc-cf49-465f-97e6-aedb8c829040)
+![photo_2024-06-27_10-24-51 (3)](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/ec1e5414-21dd-4cec-8585-17eeadc51060)
+![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/60c07839-33de-48ce-9db8-98f8f7a0bfbe)
+
 
 ---
 
 ## Credits
 
 - [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
-- Muza - Providing help with Telegram message sending. (Never really used Telegram before, so he carried)
-- [SecDbg](https://github.com/secdbg) - Contributing heavily to development.
+- [SecDbg](https://github.com/secdbg) - Contributing heavily to development (Follow him, Deserved asf and hes 🐐).
+- [KDot227](https://github.com/KDot227) - Hosts list.
+
+
+![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/09ce45b5-81d5-4940-a2d8-99706c5aaed1)
+
+
+## FUTURE IDEAS FOR US
+- Refracture Code (its messy)
+- Games Stealing (Riot,Epic,Steam stealing)
+- Self Destruct (Melt file)
+- Kill Discord Token Protector
+- Modify Assembly Info (Icon,Assm Info etc) (metadata)
+- Documentation inside GUI, what each thing does.
+- Encrypted Traffic (HTTPS)
