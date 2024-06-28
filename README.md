@@ -87,3 +87,12 @@
  
 ![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/09ce45b5-81d5-4940-a2d8-99706c5aaed1)
 
+
+## FUTURE IDEAS FOR US
+- Refracture Code (its messy)
+- Games Stealing (Riot,Epic,Steam stealing)
+- Self Destruct (Melt file)
+- Kill Discord Token Protector
+- Modify Assembly Info (Icon,Assm Info etc) (metadata)
+- Documentation inside GUI, what each thing does.
+- Encrypt Traffic
