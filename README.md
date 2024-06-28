@@ -68,6 +68,15 @@
 
 ---
 
+## GUI & Logs: 
+![photo_2024-06-27_10-24-51](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/493a1360-88eb-4cef-9ed6-11ea97c26354)
+![photo_2024-06-27_10-24-51 (2)](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/f85e40bc-cf49-465f-97e6-aedb8c829040)
+![photo_2024-06-27_10-24-51 (3)](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/ec1e5414-21dd-4cec-8585-17eeadc51060)
+![image](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/60c07839-33de-48ce-9db8-98f8f7a0bfbe)
+
+
+---
+
 ## Credits
 
 - [hackirby](https://github.com/hackirby) - Providing the base for the stealer.
