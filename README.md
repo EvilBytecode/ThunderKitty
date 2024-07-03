@@ -115,4 +115,5 @@ By using this tool, you signify your acceptance of this disclaimer. If you do no
 - Kill Discord Token Protector
 - Modify Assembly Info (Icon,Assm Info etc) (metadata)
 - Documentation inside GUI, what each thing does.
-- Encrypted Traffic (HTTPS)
+- check if user is running on server ```http://ip-api.com/line/?fields=hosting```
+- after check if it has stimulated a fake https con or not
