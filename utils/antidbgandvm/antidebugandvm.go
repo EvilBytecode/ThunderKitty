@@ -7,7 +7,6 @@ import (
 	"github.com/EvilBytecode/GoDefender/AntiDebug/CheckBlacklistedWindowsNames"
 	"github.com/EvilBytecode/GoDefender/AntiDebug/InternetCheck"
 	"github.com/EvilBytecode/GoDefender/AntiDebug/IsDebuggerPresent"
-	"github.com/EvilBytecode/GoDefender/AntiDebug/KillBadProcesses"
 	"github.com/EvilBytecode/GoDefender/AntiDebug/ParentAntiDebug"
 	"github.com/EvilBytecode/GoDefender/AntiDebug/RemoteDebugger"
 	"github.com/EvilBytecode/GoDefender/AntiDebug/RunningProcesses"
@@ -67,7 +66,6 @@ func ThunderKitty() {
 		log.Println("[DEBUG] Screen size is small")
 		os.Exit(-1)
 	}
-	KillBadProcesses.KillProcesses()
 	CheckBlacklistedWindowsNames.CheckBlacklistedWindows()
 
 	// Other AntiDebug checks
