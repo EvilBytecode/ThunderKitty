@@ -4,6 +4,7 @@
 - ~~want paid ver? contact me at : https://t.me/codepulze~~ (crossed out as codepulze quit o7)
 - 🔑 Open-source stealer written in Go, all logs will be sent to a Telegram bot.
 - <a href="https://t.me/pulzetools"><img src="https://img.shields.io/badge/Join%20my%20Telegram%20group-2CA5E0?style=for-the-badge&logo=telegram&labelColor=db44ad&color=5e2775"></a>
+[![Join our Discord server!](https://invidget.switchblade.xyz/NRTdwYutdQ)](http://discord.gg/NRTdwYutdQ)
 
 ![ThunderKitty Logo](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/3c98bcf2-b958-48ae-8c5a-c8a0be13abd4)
 
