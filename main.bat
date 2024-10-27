@@ -10,11 +10,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 :: Install required modules
-go get -u fyne.io/fyne/v2@latest
-go get -u golang.org/x/crypto/pbkdf2
-go get -u modernc.org/sqlite
-go get -u github.com/shirou/gopsutil/disk
-go get -u github.com/EvilBytecode/GoDefender
+go mod tidy
 
 :: Check if all modules were installed successfully
 if %ERRORLEVEL% neq 0 (
