@@ -1,4 +1,6 @@
 # ThunderKitty
+## Telegram:
+- https://t.me/ebytelabs
 ![ThunderKitty Logo](https://github.com/EvilBytecode/ThunderKitty/assets/151552809/3c98bcf2-b958-48ae-8c5a-c8a0be13abd4)
 
 ---
